@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta name="referrer" content="no-referrer">
+<title>Apartman Aidat Takip</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c0f1a;--bg2:#141829;--card:#1a1f35;--card2:#212744;
+  --text:#e8eaf0;--dim:#8b92b0;
+  --accent:#f0a050;--accent2:#e07a3a;
+  --green:#34d399;--green-bg:rgba(52,211,153,0.1);--green-bdr:rgba(52,211,153,0.3);
+  --red:#f87171;--red-bg:rgba(248,113,113,0.1);--red-bdr:rgba(248,113,113,0.3);
+  --blue:#60a5fa;--blue-bg:rgba(96,165,250,0.1);
+  --border:#252b48;--border2:#353b5e;
+  --radius:14px;--font:'Outfit',sans-serif;--font-d:'Fraunces',serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh}
+::selection{background:var(--accent);color:var(--bg)}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow{0%,100%{box-shadow:0 0 16px rgba(240,160,80,0.12)}50%{box-shadow:0 0 32px rgba(240,160,80,0.22)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.anim{animation:fadeUp .45s ease both}
+.ad1{animation-delay:.07s}.ad2{animation-delay:.14s}.ad3{animation-delay:.21s}.ad4{animation-delay:.28s}.ad5{animation-delay:.35s}
+.nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:50;backdrop-filter:blur(16px)}
+.nav-left{display:flex;align-items:center;gap:10px}
+.nav-logo{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),#d06830);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;animation:glow 3s ease infinite}
+.nav-title{font-family:var(--font-d);font-weight:800;font-size:17px}.nav-title span{color:var(--accent)}
+.nav-tabs{display:flex;gap:2px}
+.ntab{padding:7px 14px;border-radius:7px;border:none;background:transparent;color:var(--dim);font-family:var(--font);font-weight:600;font-size:12px;cursor:pointer;transition:all .2s;position:relative}
+.ntab:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.ntab.active{color:var(--accent);background:rgba(240,160,80,.08)}
+.ntab.active::after{content:"";position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:20px;height:2px;background:var(--accent);border-radius:1px}
+.nav-right{display:flex;gap:6px;align-items:center}
+.badge{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:700;letter-spacing:.5px}
+.badge-admin{background:rgba(240,160,80,.12);color:var(--accent);border:1px solid rgba(240,160,80,.25)}
+.badge-viewer{background:rgba(139,146,176,.1);color:var(--dim);border:1px solid rgba(139,146,176,.15)}
+.nbtn{padding:7px 12px;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--dim);font-family:var(--font);font-weight:600;font-size:11px;cursor:pointer;transition:all .2s}.nbtn:hover{border-color:var(--accent);color:var(--accent)}
+.page{display:none;padding:20px;max-width:1360px;margin:0 auto}.page.active{display:block}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}
+.sc{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s}
+.sc:hover{transform:translateY(-1px);border-color:var(--border2)}
+.sc::before{content:"";position:absolute;top:0;left:0;right:0;height:2px}
+.sc:nth-child(1)::before{background:var(--accent)}.sc:nth-child(2)::before{background:var(--green)}.sc:nth-child(3)::before{background:var(--red)}.sc:nth-child(4)::before{background:var(--blue)}.sc:nth-child(5)::before{background:var(--accent)}
+.sc-icon{font-size:18px;margin-bottom:6px}.sc-label{font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.sc-val{font-family:var(--font-d);font-size:22px;font-weight:800}
+.sc-val.grn{color:var(--green)}.sc-val.red{color:var(--red)}.sc-val.blu{color:var(--blue)}.sc-val.acc{color:var(--accent)}
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.ynav{display:flex;align-items:center;gap:10px}
+.ybtn{width:34px;height:34px;border-radius:7px;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;color:var(--dim);transition:all .2s}.ybtn:hover{border-color:var(--accent);color:var(--accent)}
+.ytxt{font-family:var(--font-d);font-size:22px;font-weight:800}
+.tbtns{display:flex;gap:6px}
+.tbtn{padding:7px 14px;border:1px solid var(--border);border-radius:7px;background:var(--card);color:var(--dim);font-family:var(--font);font-weight:600;font-size:11px;cursor:pointer;transition:all .2s}.tbtn:hover{border-color:var(--accent);color:var(--accent)}
+.tbtn-acc{background:rgba(240,160,80,.08);border-color:rgba(240,160,80,.25);color:var(--accent)}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--radius);border:1px solid var(--border);background:var(--card)}
+table{width:100%;border-collapse:collapse;min-width:800px}
+table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--dim);padding:12px 8px;text-align:center;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:2}
+table th:first-child,table th:nth-child(2){text-align:left;padding-left:18px}
+table td{padding:11px 8px;text-align:center;border-bottom:1px solid rgba(37,43,72,.6);font-size:12px;transition:background .15s}
+table td:first-child{font-weight:700;padding-left:18px;text-align:left}
+table td:nth-child(2){padding-left:18px;text-align:left;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+table tr:last-child td{border-bottom:none}
+table tr:hover td{background:rgba(240,160,80,.015)}
+table tr[data-no]{cursor:pointer}
+.ck{width:30px;height:30px;border-radius:7px;border:2px solid var(--border);background:var(--bg2);display:inline-flex;align-items:center;justify-content:center;transition:all .15s;font-size:14px;-webkit-tap-highlight-color:transparent;user-select:none}
+.ck.adm{cursor:pointer}.ck.adm:hover{border-color:var(--accent);transform:scale(1.08)}.ck.adm:active{transform:scale(.9)}
+.ck.p{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 0 10px rgba(52,211,153,.18)}.ck.p::after{content:"\2713";font-weight:800}
+.ck.adm.u:hover{border-color:var(--red);background:var(--red-bg)}
+.cm{background:rgba(240,160,80,.035)}
+table th.cm{background:rgba(240,160,80,.08);color:var(--accent)}
+.rp{padding:3px 9px;border-radius:16px;font-size:10px;font-weight:700;display:inline-block}
+.rp.f{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bdr)}
+.rp.h{background:rgba(250,204,21,.08);color:#facc15;border:1px solid rgba(250,204,21,.2)}
+.rp.e{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bdr)}
+.dp{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-top:16px;display:none}
+.dp.show{display:block;animation:fadeUp .25s ease}
+.dp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.dp-title{font-family:var(--font-d);font-size:18px;font-weight:800}
+.dp-close{background:none;border:none;color:var(--dim);font-size:20px;cursor:pointer;padding:4px}.dp-close:hover{color:var(--text)}
+.dp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.dm{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;transition:border-color .2s}
+.dm.paid{border-color:var(--green-bdr);background:var(--green-bg)}
+.dm-name{font-size:11px;font-weight:600;color:var(--dim);margin-bottom:4px}
+.dm-icon{font-size:18px;margin-bottom:2px}.dm-date{font-size:9px;color:var(--dim)}
+.gh{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.gc{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.gc .sc{padding:14px 16px}.gc .sc-val{font-size:20px}
+.gl{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.gr{display:grid;grid-template-columns:100px 1fr 100px 36px;gap:10px;padding:12px 18px;border-bottom:1px solid rgba(37,43,72,.5);align-items:center;transition:background .15s}
+.gr:hover{background:rgba(240,160,80,.015)}.gr:last-child{border-bottom:none}
+.gr-head{background:var(--bg2);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--dim);padding:10px 18px}
+.gr-date{font-weight:600;font-size:12px}.gr-desc{font-size:12px;color:var(--dim)}.gr-amt{font-weight:700;color:var(--red);text-align:right;font-size:13px}
+.gr-del{width:30px;height:30px;border-radius:6px;border:none;background:transparent;color:var(--dim);cursor:pointer;font-size:13px;transition:all .15s;display:flex;align-items:center;justify-content:center}.gr-del:hover{background:var(--red-bg);color:var(--red)}
+.ge{text-align:center;padding:40px;color:var(--dim);font-size:13px}
+.mbg{display:none;position:fixed;inset:0;background:rgba(12,15,26,.82);z-index:100;justify-content:center;align-items:flex-start;padding:50px 16px;overflow-y:auto;backdrop-filter:blur(6px)}.mbg.show{display:flex}
+.mdl{background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:480px;width:100%;padding:24px;position:relative;animation:fadeUp .25s ease}
+.mdl h2{font-family:var(--font-d);font-size:18px;font-weight:800;margin-bottom:16px}
+.mdl-x{position:absolute;top:12px;right:16px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--dim)}.mdl-x:hover{color:var(--text)}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-weight:600;font-size:11px;margin-bottom:4px;color:var(--dim)}
+.fg input{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);font-size:13px;color:var(--text);background:var(--bg2);transition:border-color .2s}
+.fg input:focus{outline:none;border-color:var(--accent)}
+.fg .hint{font-size:9px;color:var(--dim);margin-top:2px}
+.dl{max-height:260px;overflow-y:auto;margin:8px 0}
+.dr{display:flex;gap:6px;align-items:center;margin-bottom:5px}
+.dr .dn{width:60px;flex:none}.dr input{flex:1}
+.db{width:30px;height:30px;border-radius:7px;border:none;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.db-d{background:var(--red-bg);color:var(--red)}.db-d:hover{background:rgba(248,113,113,.25)}
+.db-a{background:var(--green-bg);color:var(--green);width:100%;height:34px;border-radius:8px;font-weight:600;font-size:12px;border:1px solid var(--green-bdr)}.db-a:hover{background:rgba(52,211,153,.15)}
+.sbtn{width:100%;padding:11px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0c0f1a;border:none;border-radius:9px;font-family:var(--font);font-weight:700;font-size:13px;cursor:pointer;margin-top:6px}.sbtn:hover{opacity:.9}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--card2);color:var(--text);padding:10px 22px;border-radius:9px;font-weight:600;font-size:12px;opacity:0;transition:all .25s;pointer-events:none;z-index:200;border:1px solid var(--border);white-space:nowrap}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.lds{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:300}
+.lds h2{font-family:var(--font-d);font-size:20px;margin-bottom:6px}.lds p{color:var(--dim);font-size:12px}
+.spn{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media print{body{background:#fff;color:#000}.nav,.tbtns,.dp,.mbg,.toast,.badge,.nbtn{display:none!important}.tw{border:1px solid #ccc}table th{background:#eee;color:#333}table td{color:#333;border-bottom-color:#eee}.sc{border:1px solid #ccc;background:#fff}.sc-val,.sc-val.grn,.sc-val.red,.sc-val.blu,.sc-val.acc{color:#000}}
+@media(max-width:768px){.nav{padding:0 10px;height:52px}.nav-title{font-size:14px}.ntab{padding:5px 8px;font-size:10px}.page{padding:10px}.stats{grid-template-columns:repeat(2,1fr);gap:6px}.sc{padding:12px}.sc-val{font-size:18px}table th,table td{padding:8px 5px;font-size:10px}.ck{width:26px;height:26px;font-size:12px;border-radius:5px}.dp-grid{grid-template-columns:repeat(3,1fr)}.gc{grid-template-columns:1fr}.gr{grid-template-columns:80px 1fr 80px 30px;gap:4px;padding:8px 10px}.ytxt{font-size:18px}}
+@media(max-width:420px){.nav-logo{display:none}.stats{grid-template-columns:1fr 1fr}.sc:nth-child(5){grid-column:span 2}.dp-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="lds" id="lds"><div class="spn"></div><h2>Yükleniyor...</h2><p>Firebase'e bağlanılıyor</p></div>
+<div id="app" style="display:none">
+<div class="nav">
+  <div class="nav-left"><div class="nav-logo">🏢</div><div class="nav-title" id="nTitle">Apartman <span>Aidat</span></div></div>
+  <div class="nav-tabs"><button class="ntab active" data-p="aid">📊 Aidatlar</button><button class="ntab" data-p="gid">💸 Giderler</button></div>
+  <div class="nav-right"><span class="badge badge-viewer" id="rBadge">Sakin</span><button class="nbtn" id="bLogin">🔑 Giriş</button><button class="nbtn" id="bSet" style="display:none">⚙️</button></div>
+</div>
+<div class="page active" id="p-aid">
+<div class="stats">
+  <div class="sc anim ad1"><div class="sc-icon">🏠</div><div class="sc-label">Toplam Daire</div><div class="sc-val" id="sT">0</div></div>
+  <div class="sc anim ad2"><div class="sc-icon">✅</div><div class="sc-label">Bu Ay Ödenen</div><div class="sc-val grn" id="sP">0</div></div>
+  <div class="sc anim ad3"><div class="sc-icon">❌</div><div class="sc-label">Bu Ay Ödenmemiş</div><div class="sc-val red" id="sU">0</div></div>
+  <div class="sc anim ad4"><div class="sc-icon">💰</div><div class="sc-label">Kasa Bakiye</div><div class="sc-val blu" id="sK">₺0</div></div>
+  <div class="sc anim ad5"><div class="sc-icon">📊</div><div class="sc-label">Aylık Aidat</div><div class="sc-val acc" id="sA">₺0</div></div>
+</div>
+<div class="toolbar"><div class="ynav"><button class="ybtn" id="yP">◀</button><div class="ytxt" id="yD">2026</div><button class="ybtn" id="yN">▶</button></div><div class="tbtns"><button class="tbtn" id="bPrint">🖨️ Yazdır</button></div></div>
+<div class="tw"><table><thead><tr id="tH"></tr></thead><tbody id="tB"></tbody></table></div>
+<div class="dp" id="dP"><div class="dp-head"><div class="dp-title" id="dT"></div><button class="dp-close" id="dC">✕</button></div><div class="dp-grid" id="dG"></div></div>
+</div>
+<div class="page" id="p-gid">
+<div class="gc"><div class="sc"><div class="sc-label">Toplam Gelir</div><div class="sc-val grn" id="gG">₺0</div></div><div class="sc"><div class="sc-label">Toplam Gider</div><div class="sc-val red" id="gX">₺0</div></div><div class="sc"><div class="sc-label">Kasa Bakiye</div><div class="sc-val acc" id="gB">₺0</div></div></div>
+<div class="gh"><h2 style="font-family:var(--font-d);font-size:18px">Gider Kayıtları — <span id="gY">2026</span></h2><button class="tbtn tbtn-acc" id="bAG" style="display:none">+ Gider Ekle</button></div>
+<div class="gl"><div class="gr gr-head"><div>Tarih</div><div>Açıklama</div><div style="text-align:right">Tutar</div><div></div></div><div id="gL"></div></div>
+</div>
+</div>
+
+<div class="mbg" id="mLogin"><div class="mdl"><button class="mdl-x" id="xLogin">✕</button><h2>🔑 Yönetici Girişi</h2><div class="fg"><label>Email</label><input type="email" id="iEmail" placeholder="Email adresiniz"></div><div class="fg"><label>Şifre</label><input type="password" id="iPass" placeholder="Şifrenizi girin"></div><button class="sbtn" id="bDoLogin">Giriş Yap</button></div></div>
+<div class="mbg" id="mSet"><div class="mdl"><button class="mdl-x" id="xSet">✕</button><h2>⚙️ Ayarlar</h2>
+<div class="fg"><label>Apartman Adı</label><input id="cN" placeholder="Güneş Apartmanı"></div>
+<h2 style="margin-top:16px">💰 Yıllık Aidat Tutarları</h2>
+<div id="aY"></div><button class="db db-a" id="bAY" style="margin:8px 0">+ Yıl Ekle</button>
+<h2 style="margin-top:16px">🏠 Daireler</h2>
+<div class="dl" id="dL"></div><button class="db db-a" id="bAD">+ Daire Ekle</button>
+<button class="sbtn" id="bSS" style="margin-top:12px">💾 Kaydet</button>
+</div></div>
+<div class="mbg" id="mGid"><div class="mdl"><button class="mdl-x" id="xGid">✕</button><h2>+ Gider Ekle</h2>
+<div class="fg"><label>Tarih</label><input type="date" id="giD"></div>
+<div class="fg"><label>Açıklama</label><input id="giA" placeholder="Asansör bakımı"></div>
+<div class="fg"><label>Tutar (₺)</label><input type="number" id="giT" placeholder="500"></div>
+<button class="sbtn" id="bSG">💾 Kaydet</button>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+if(typeof firebase==="undefined"){document.getElementById("lds").innerHTML="<h2 style='color:var(--red)'>Bağlantı hatası</h2><p>Sayfayı yenileyin</p>";throw new Error("no fb")}
+firebase.initializeApp({apiKey:"AIzaSyDIwMdySFK2aKOs1qu23uDtTXRXiNOIe4c",authDomain:"aidat-fb6d1.firebaseapp.com",databaseURL:"https://aidat-fb6d1-default-rtdb.firebaseio.com",projectId:"aidat-fb6d1",storageBucket:"aidat-fb6d1.firebasestorage.app",messagingSenderId:"440150533915",appId:"1:440150533915:web:fd4f903aa09f701d4a15be"});
+var db=firebase.database();
+
+var CY=new Date().getFullYear(),CM=new Date().getMonth();
+// D artık object: { "d1": {no:"1",isim:"Ali",aylar:{...}}, "d2": {...} }
+var D={},CFG={apartmanAdi:"Apartman",aidatlar:{}},GID={};
+var ADM=false;
+var AY=["Ocak","\u015eubat","Mart","Nisan","May\u0131s","Haziran","Temmuz","A\u011fustos","Eyl\u00fcl","Ekim","Kas\u0131m","Aral\u0131k"];
+
+var $=function(s){return document.querySelector(s)};
+var $$=function(s){return document.querySelectorAll(s)};
+function esc(t){if(!t)return"";var d=document.createElement("div");d.appendChild(document.createTextNode(String(t)));return d.innerHTML}
+function sanitize(t){return String(t||"").replace(/[<>"'&]/g,"").trim().substring(0,200)}
+function toast(m){var t=$("#toast");t.textContent=m;t.classList.add("show");setTimeout(function(){t.classList.remove("show")},2500)}
+function fmt(n){return"\u20ba"+Number(n||0).toLocaleString("tr-TR")}
+function aidat(y){var a=CFG.aidatlar||{};if(a["y"+y])return Number(a["y"+y]);var ks=Object.keys(a).sort();for(var i=ks.length-1;i>=0;i--)if(Number(ks[i].replace("y",""))<=y)return Number(a[ks[i]]);return 500}
+
+// Daireleri sıralı array olarak al
+function dairelerArr(){
+  var arr=[];
+  Object.keys(D).forEach(function(k){var d=D[k];d._key=k;arr.push(d)});
+  arr.sort(function(a,b){return(parseInt(a.no)||0)-(parseInt(b.no)||0)});
+  return arr;
+}
+
+// FIREBASE LISTENERS
+db.ref("config").on("value",function(s){var v=s.val();if(v){CFG=v;CFG.aidatlar=CFG.aidatlar||{}}show();render()});
+db.ref("daireler").on("value",function(s){D=s.val()||{};show();render()});
+db.ref("giderler").on("value",function(s){GID=s.val()||{};rGid()});
+setTimeout(show,2000);
+
+function show(){$("#lds").style.display="none";$("#app").style.display="block"}
+
+function render(){
+  show();
+  $("#nTitle").innerHTML=esc(CFG.apartmanAdi||"Apartman")+" <span>Aidat</span>";
+  document.title=(CFG.apartmanAdi||"Apartman")+" — Aidat";
+  $("#yD").textContent=CY;
+  var at=aidat(CY),yk="y"+CY,tm=AY[CM],pd=0,up=0,tot=0;
+  var darr=dairelerArr();
+
+  darr.forEach(function(d){
+    var a=d.aylar&&d.aylar[yk]?d.aylar[yk]:{};
+    if(a[tm]&&a[tm].odendi)pd++;else up++;
+    AY.forEach(function(ay){if(a[ay]&&a[ay].odendi)tot+=at});
+  });
+  var tg=0;Object.values(GID).forEach(function(g){if(g.tarih&&g.tarih.startsWith(String(CY)))tg+=Number(g.tutar||0)});
+  $("#sT").textContent=darr.length;$("#sP").textContent=pd;$("#sU").textContent=up;
+  $("#sK").textContent=fmt(tot-tg);$("#sA").textContent=fmt(at);
+
+  var th="<th>No</th><th>Sakin</th>";
+  AY.forEach(function(ay,i){th+="<th class='"+(i===CM&&CY===new Date().getFullYear()?"cm":"")+"'>"+ay.substring(0,3)+"</th>"});
+  th+="<th>Durum</th>";$("#tH").innerHTML=th;
+
+  var tb="";
+  if(!darr.length){tb="<tr><td colspan='15' style='text-align:center;padding:40px;color:var(--dim)'>Henüz daire eklenmemiş</td></tr>"}
+  else darr.forEach(function(d){
+    var a=d.aylar&&d.aylar[yk]?d.aylar[yk]:{},pc=0;
+    var key=d._key;
+    tb+="<tr data-no='"+esc(key)+"'><td>"+esc(String(d.no))+"</td><td>"+esc(d.isim||"")+"</td>";
+    AY.forEach(function(ay,j){
+      var ip=!!(a[ay]&&a[ay].odendi);if(ip)pc++;
+      var cc=j===CM&&CY===new Date().getFullYear()?"cm":"";
+      tb+="<td class='"+cc+"'><div class='ck "+(ip?"p":"u")+(ADM?" adm":"")+"' data-k='"+esc(key)+"' data-a='"+ay+"'></div></td>"
+    });
+    var rc=pc===12?"f":(pc>0?"h":"e");
+    tb+="<td><span class='rp "+rc+"'>"+pc+"/12</span></td></tr>"
+  });
+  $("#tB").innerHTML=tb;
+
+  // Checkbox click — daire key bazlı
+  if(ADM)$$(".ck.adm").forEach(function(el){el.addEventListener("click",function(e){
+    e.stopPropagation();
+    var key=this.dataset.k,ay=this.dataset.a;
+    var d=D[key];if(!d)return;
+    var yk="y"+CY;
+    var a=d.aylar&&d.aylar[yk]?d.aylar[yk]:{};
+    var cur=!!(a[ay]&&a[ay].odendi);
+    var path="daireler/"+key+"/aylar/"+yk+"/"+ay;
+    if(cur)db.ref(path).remove();
+    else db.ref(path).set({odendi:true,tarih:new Date().toISOString().slice(0,10)});
+    toast(d.no+" — "+ay+": "+(cur?"\u274c Geri alındı":"\u2705 Ödendi"));
+  })});
+
+  // Row click → detail
+  $$("#tB tr[data-no]").forEach(function(tr){tr.addEventListener("click",function(){showD(this.dataset.no)})});
+  updUI();
+}
+
+function showD(key){
+  var d=D[key];if(!d)return;
+  var yk="y"+CY,a=d.aylar&&d.aylar[yk]?d.aylar[yk]:{},at=aidat(CY);
+  var totPaid=0;AY.forEach(function(ay){if(a[ay]&&a[ay].odendi)totPaid++});
+  var borc=(12-totPaid)*at;
+  $("#dT").textContent="Daire "+d.no+" — "+(d.isim||"")+" (Borç: "+fmt(borc)+")";
+  var h="";AY.forEach(function(ay){
+    var data=a[ay],ip=!!(data&&data.odendi),dt=ip&&data.tarih?data.tarih:"—";
+    h+="<div class='dm"+(ip?" paid":"")+"'><div class='dm-name'>"+ay+"</div><div class='dm-icon'>"+(ip?"\u2705":"\u274c")+"</div><div class='dm-date'>"+dt+"</div></div>";
+  });
+  $("#dG").innerHTML=h;$("#dP").classList.add("show");$("#dP").scrollIntoView({behavior:"smooth"});
+}
+$("#dC").addEventListener("click",function(){$("#dP").classList.remove("show")});
+
+// GIDERLER
+function rGid(){
+  var at=aidat(CY),yk="y"+CY,tGelir=0,tGider=0;
+  dairelerArr().forEach(function(d){
+    var a=d.aylar&&d.aylar[yk]?d.aylar[yk]:{};
+    AY.forEach(function(ay){if(a[ay]&&a[ay].odendi)tGelir+=at});
+  });
+  Object.values(GID).forEach(function(g){if(g.tarih&&g.tarih.startsWith(String(CY)))tGider+=Number(g.tutar||0)});
+  $("#gG").textContent=fmt(tGelir);$("#gX").textContent=fmt(tGider);$("#gB").textContent=fmt(tGelir-tGider);
+  $("#gY").textContent=CY;
+
+  var fl=Object.values(GID).filter(function(g){return g.tarih&&g.tarih.startsWith(String(CY))});
+  fl.sort(function(a,b){return(b.tarih||"").localeCompare(a.tarih||"")});
+  var h="";
+  if(!fl.length)h="<div class='ge'>Bu yıl için gider kaydı yok</div>";
+  else fl.forEach(function(g){
+    var del=ADM?"<button class='gr-del' data-k='"+esc(g.key||"")+"'>\u2715</button>":"";
+    h+="<div class='gr'><div class='gr-date'>"+esc(g.tarih||"")+"</div><div class='gr-desc'>"+esc(g.aciklama||"")+"</div><div class='gr-amt'>"+fmt(g.tutar)+"</div><div>"+del+"</div></div>";
+  });
+  $("#gL").innerHTML=h;
+  if(ADM)$$(".gr-del").forEach(function(b){b.addEventListener("click",function(){var k=this.dataset.k;if(k&&confirm("Gideri sil?")){db.ref("giderler/"+k).remove();toast("\u2705 Silindi")}})});
+}
+
+// TABS
+$$(".ntab").forEach(function(t){t.addEventListener("click",function(){$$(".ntab").forEach(function(x){x.classList.remove("active")});$$(".page").forEach(function(x){x.classList.remove("active")});this.classList.add("active");$("#p-"+this.dataset.p).classList.add("active");if(this.dataset.p==="gid")rGid()})});
+$("#yP").addEventListener("click",function(){CY--;render();rGid()});
+$("#yN").addEventListener("click",function(){CY++;render();rGid()});
+
+// ADMIN UI
+function updUI(){
+  $("#rBadge").className="badge "+(ADM?"badge-admin":"badge-viewer");
+  $("#rBadge").textContent=ADM?"Yönetici":"Sakin";
+  $("#bLogin").textContent=ADM?"\uD83D\uDD13 Çıkış":"\uD83D\uDD11 Giriş";
+  $("#bSet").style.display=ADM?"inline-flex":"none";
+  $("#bAG").style.display=ADM?"inline-flex":"none";
+}
+// AUTH STATE
+var auth=firebase.auth();
+auth.onAuthStateChanged(function(user){
+  ADM=!!user;updUI();render();rGid();
+});
+
+$("#bLogin").addEventListener("click",function(){
+  if(ADM){auth.signOut().then(function(){toast("Çıkış yapıldı")});return}
+  $("#iEmail").value="";$("#iPass").value="";$("#mLogin").classList.add("show");
+});
+$("#xLogin").addEventListener("click",function(){$("#mLogin").classList.remove("show")});
+$("#mLogin").addEventListener("click",function(e){if(e.target===this)this.classList.remove("show")});
+function doLogin(){
+  var email=$("#iEmail").value,pass=$("#iPass").value;
+  if(!email||!pass){toast("Email ve şifre girin");return}
+  auth.signInWithEmailAndPassword(email,pass).then(function(){
+    $("#mLogin").classList.remove("show");
+    toast("\u2705 Giriş başarılı!");
+  }).catch(function(err){
+    toast("\u274c "+((err.code==="auth/wrong-password"||err.code==="auth/user-not-found"||err.code==="auth/invalid-credential")?"Yanlış email veya şifre!":err.message));
+  });
+}
+$("#bDoLogin").addEventListener("click",doLogin);
+$("#iPass").addEventListener("keydown",function(e){if(e.key==="Enter")doLogin()});
+
+// SETTINGS
+$("#bSet").addEventListener("click",function(){$("#cN").value=CFG.apartmanAdi||"";$("#cP").value="";rAY();rDL();$("#mSet").classList.add("show")});
+$("#xSet").addEventListener("click",function(){$("#mSet").classList.remove("show")});
+$("#mSet").addEventListener("click",function(e){if(e.target===this)this.classList.remove("show")});
+
+var eA={};
+function rAY(){eA=JSON.parse(JSON.stringify(CFG.aidatlar||{}));if(!Object.keys(eA).length)eA["y"+CY]=500;dAY()}
+function dAY(){
+  var h="";Object.keys(eA).sort().forEach(function(k){
+    h+="<div class='dr' style='margin-bottom:5px'><input class='dn' value='"+k.replace("y","")+"' data-k='"+k+"' data-f='y' placeholder='Yıl'><input type='number' value='"+eA[k]+"' data-k='"+k+"' data-f='t' placeholder='₺'><button class='db db-d' data-k='"+k+"' data-t='a'>✕</button></div>";
+  });
+  $("#aY").innerHTML=h;
+  $$("#aY input").forEach(function(inp){inp.addEventListener("input",function(){if(this.dataset.f==="t")eA[this.dataset.k]=Number(this.value)||0})});
+  $$("#aY .db-d").forEach(function(b){b.addEventListener("click",function(){delete eA[this.dataset.k];dAY()})});
+}
+$("#bAY").addEventListener("click",function(){var n=CY+1;eA["y"+n]=eA["y"+CY]||500;dAY()});
+
+// Daire düzenleme — key bazlı
+var eD=[];// [{key:"d5",no:"5",isim:"Ali"}, ...]
+function rDL(){
+  eD=[];
+  Object.keys(D).forEach(function(k){eD.push({key:k,no:D[k].no,isim:D[k].isim})});
+  eD.sort(function(a,b){return(parseInt(a.no)||0)-(parseInt(b.no)||0)});
+  dDL();
+}
+function dDL(){
+  var h="";eD.forEach(function(d,i){
+    h+="<div class='dr'><input class='dn' value='"+esc(String(d.no||""))+"' data-i='"+i+"' data-f='no' placeholder='No'><input value='"+esc(d.isim||"")+"' data-i='"+i+"' data-f='isim' placeholder='İsim Soyisim'><button class='db db-d' data-i='"+i+"'>✕</button></div>";
+  });
+  $("#dL").innerHTML=h;
+  $$("#dL .db-d").forEach(function(b){b.addEventListener("click",function(){eD.splice(+this.dataset.i,1);dDL()})});
+  $$("#dL input").forEach(function(inp){inp.addEventListener("input",function(){eD[+this.dataset.i][this.dataset.f]=this.value})});
+}
+$("#bAD").addEventListener("click",function(){
+  var n=eD.length?Math.max.apply(null,eD.map(function(d){return parseInt(d.no)||0}))+1:1;
+  eD.push({key:"d"+n,no:String(n),isim:"",_new:true});
+  dDL();$("#dL").scrollTop=$("#dL").scrollHeight;
+});
+
+// SAVE SETTINGS — key bazlı kaydetme
+$("#bSS").addEventListener("click",function(){
+  var nc={apartmanAdi:sanitize($("#cN").value)||"Apartman",aidatlar:eA};
+  
+  // Yeni daireler objesini oluştur
+  var newD={};
+  eD.forEach(function(ed){
+    var key="d"+String(ed.no).replace(/[^a-zA-Z0-9]/g,"");
+    var existing=D[ed.key]||D[key];
+    newD[key]={
+      no:sanitize(ed.no),
+      isim:sanitize(ed.isim),
+      aylar:existing?existing.aylar||{}:{}
+    };
+  });
+  
+  toast("Kaydediliyor...");
+  db.ref("config").set(nc);
+  db.ref("daireler").set(newD).then(function(){toast("\u2705 Kaydedildi!");$("#mSet").classList.remove("show")});
+});
+
+// GIDER MODAL
+$("#bAG").addEventListener("click",function(){$("#giD").value=new Date().toISOString().slice(0,10);$("#giA").value="";$("#giT").value="";$("#mGid").classList.add("show")});
+$("#xGid").addEventListener("click",function(){$("#mGid").classList.remove("show")});
+$("#mGid").addEventListener("click",function(e){if(e.target===this)this.classList.remove("show")});
+$("#bSG").addEventListener("click",function(){
+  var t=$("#giD").value,a=sanitize($("#giA").value),tu=Number($("#giT").value);
+  if(!t||!a||!tu||tu<=0){toast("Tüm alanları doğru doldurun");return}
+  if(tu>10000000){toast("Tutar çok yüksek");return}
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(t)){toast("Geçersiz tarih");return}
+  var k=db.ref("giderler").push().key;
+  db.ref("giderler/"+k).set({key:k,tarih:t,aciklama:a,tutar:Number(tu)});
+  toast("\u2705 Gider eklendi");$("#mGid").classList.remove("show");
+});
+
+$("#bPrint").addEventListener("click",function(){window.print()});
+</script>
+</body>
+</html>
